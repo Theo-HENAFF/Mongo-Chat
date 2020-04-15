@@ -35,6 +35,13 @@ $('#login form').submit(function (e) {
     username : $('#login input').val().trim()
   };
   if (user.username.length > 0) { // Si le champ de connexion n'est pas vide
+    $.get("/api/message/".concat(user.username),function(messages){
+      console.log(messages)
+      messages.forEach(function(mess) {
+        var message = {user: mess.user, text: "message antérieur du ".concat(mess.createdAt,": ",mess.content)}
+        socket.emit('chat-message', message);
+      })
+    });
     socket.emit('user-login', user, function (success) {
       if (success) {
         $('body').removeAttr('id'); // Cache formulaire de connexion
@@ -43,6 +50,7 @@ $('#login form').submit(function (e) {
     });
   }
 });
+
 
 /**
  * Envoi d'un message
