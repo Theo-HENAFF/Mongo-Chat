@@ -17,7 +17,6 @@ app.use(Routes);
 
 
 
-
 /**
  * Gestion des requêtes HTTP des utilisateurs en leur renvoyant les fichiers du dossier 'public'
  */
