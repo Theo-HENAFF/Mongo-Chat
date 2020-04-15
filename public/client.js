@@ -3,6 +3,7 @@
 var socket = io();
 var i, j;
 
+src="bower_components/sightglass/index.js"
 src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"
 
 /**
@@ -53,6 +54,7 @@ $('#chat form').submit(function (e) {
   };
   $('#m').val('');
   if (message.text.trim().length !== 0) { // Gestion message vide
+    $.post("/api/message", {user:message.label, content:message.text})
     socket.emit('chat-message', message);
   }
   $('#chat input').focus(); // Focus sur le champ du message
@@ -63,7 +65,6 @@ $('#chat form').submit(function (e) {
  */
 socket.on('chat-message', function (message) {
   message.label = message.username;
-  $.post("/api/message", {user:message.username, content:message.text})
 
   messages.push(message);
   utils.scrollToBottom();

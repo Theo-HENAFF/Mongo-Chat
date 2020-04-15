@@ -6,6 +6,10 @@ router.get('/api/messages',(req, res) => {
   controller.getMessages(req, res);
 });
 
+router.get('/api/message/:username',(req, res) => {
+  controller.getMessageByUser(req, res);
+});
+
 router.post('/api/message', (req, res) => {
   controller.postMessage(req, res);
 });

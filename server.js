@@ -183,7 +183,7 @@ io.on('connection', function (socket) {
  */
 
 const mongoose = require('mongoose');
-database = 'mongodb://localhost:27017/StockBot';
+database = 'mongodb://localhost:27017';
 mongoose.connect(database, (err) => {
   if (err)
     throw err;

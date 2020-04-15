@@ -6,6 +6,14 @@ function getMessages(req,res){
     });
 }
 
+function getMessageByUser(req,res){
+    const Models = require('../models');
+    Models.Message.find({user: req.params.username}, function (err, messages) {
+        if (err) throw err;
+        res.json(messages);
+    });
+}
+
 function postMessage(req,res){
 
     const Models = require('../models');
@@ -29,5 +37,6 @@ function deleteMessage(req,res){
     });
 }
 module.exports.getMessages = getMessages;
+module.exports.getMessageByUser = getMessageByUser;
 module.exports.postMessage = postMessage;
 module.exports.deleteMessage = deleteMessage;
