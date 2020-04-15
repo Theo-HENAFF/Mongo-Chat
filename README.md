@@ -4,7 +4,7 @@
 * Stockage des users dans Redis (utiliser un redis-cli pour les afficher " LRANGE users-list ")
 * Les messages sont stocké sur une base mongodb (db: CHAT colletion : messages)
 * Utilisation Replicaset (vor le ficher ReplicaSet.docx pour la démarche)
-* 
+
 
 
 
