@@ -128,6 +128,7 @@ io.on('connection', function (socket) {
       socket.emit('service-message', userServiceMessage);
       socket.broadcast.emit('service-message', broadcastedServiceMessage);
       messages.push(broadcastedServiceMessage);
+
       // Emission de 'user-login' et appel du callback
       io.emit('user-login', loggedUser);
       callback(true);
