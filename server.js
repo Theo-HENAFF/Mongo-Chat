@@ -62,6 +62,21 @@ io.on('connection', function (socket) {
     }
   }
 
+  // $.get("/api/message/".concat(user.username),function(messagess){
+  //   console.log(messagess)
+  //   messagess.forEach(function(mess) {
+  //     var message = {label: mess.user, text: "message antérieur du ".concat(mess.createdAt,": ",mess.content)}
+  //     socket.emit('chat-message', message);
+  //   })
+  // });
+  // var res = Mess.find({}, function (err, messages) {
+  //   if (err) throw err;
+  // });
+  // console.log(res);
+
+  // var allmessages = controller.getMessages()
+  // console.log(allmessages)
+
   /**
    * Déconnexion d'un utilisateur
    */
@@ -145,6 +160,13 @@ io.on('connection', function (socket) {
     // On assigne le type "message" à l'objet
     message.type = 'chat-message';
     io.emit('chat-message', message);
+
+    var newmess = new Mess ({user : message.username, content : message.text}) ;
+    console.log(newmess);
+    newmess.save(function (err,message){
+      if (err) return console.error(err);
+    });
+
     // Sauvegarde du message
     messages.push(message);
     if (messages.length > 150) {
@@ -190,4 +212,16 @@ mongoose.connect(database, (err) => {
 });
 console.log("Waiting on localhost:3000");
 
+var schema = mongoose.Schema(    {
+  user: String,
+  content: {
+    type: String,
+    default: 'DEFAULT_CONTENT'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+});
+var Mess = mongoose.model('message',schema,'messages')
 module.exports = app;

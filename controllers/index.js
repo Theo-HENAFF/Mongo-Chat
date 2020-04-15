@@ -17,7 +17,6 @@ function getMessageByUser(req,res){
 function postMessage(req,res){
 
     const Models = require('../models');
-
     const newMessage = Models.Message({
         user:req.body.user,
         content: req.body.content,
@@ -36,6 +35,8 @@ function deleteMessage(req,res){
         res.send("Message was deleted");
     });
 }
+
+
 module.exports.getMessages = getMessages;
 module.exports.getMessageByUser = getMessageByUser;
 module.exports.postMessage = postMessage;
