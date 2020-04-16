@@ -1,4 +1,4 @@
-function getMessages(req,res){
+function getMessages(req, res) {
     const Models = require('../models');
     Models.Message.find({}, function (err, messages) {
         if (err) throw err;
@@ -7,7 +7,7 @@ function getMessages(req,res){
 }
 
 
-function promiseGetMessages(req,res){
+function promiseGetMessages(req, res) {
     return new Promise(function (resolve, reject) {
         const Models = require("../models");
         Models.Message.find({}).limit(100).exec(function (err, messages) {
@@ -18,10 +18,7 @@ function promiseGetMessages(req,res){
 }
 
 
-
-
-
-function getMessageByUser(req,res){
+function getMessageByUser(req, res) {
     const Models = require('../models');
     Models.Message.find({user: req.params.username}, function (err, messages) {
         if (err) throw err;
@@ -29,32 +26,32 @@ function getMessageByUser(req,res){
     });
 }
 
-function postMessage(req,res){
+function postMessage(req, res) {
 
     const Models = require('../models');
     const newMessage = Models.Message({
-        user:req.body.user,
+        user: req.body.user,
         content: req.body.content,
     });
-    newMessage.save(function (err,mess) {
+    newMessage.save(function (err, mess) {
         if (err) throw err;
         res.send("Votre message à été sauvegarder avec succès");
     });
 }
 
-function postFromServer(req){
+function postFromServer(req) {
     const Models = require("../models");
 
     const NewMessage = Models.Message({user: req.user, content: req.content})
-    NewMessage.save(function (err,message){
+    NewMessage.save(function (err, message) {
         if (err) return console.error(err);
     });
 }
 
-function deleteMessage(req,res){
+function deleteMessage(req, res) {
 
     const Models = require('../models');
-    Models.Message.deleteOne({"_id":req.body.id},function(err) {
+    Models.Message.deleteOne({"_id": req.body.id}, function (err) {
         if (err) throw err;
         res.send("Message was deleted");
     });
