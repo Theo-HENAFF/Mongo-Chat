@@ -6,6 +6,21 @@ function getMessages(req,res){
     });
 }
 
+
+function promiseGetMessages(req,res){
+    return new Promise(function (resolve, reject) {
+        const Models = require("../models");
+        Models.Message.find({}).limit(100).exec(function (err, messages) {
+            if (err) throw err;
+            resolve(messages);
+        });
+    })
+}
+
+
+
+
+
 function getMessageByUser(req,res){
     const Models = require('../models');
     Models.Message.find({user: req.params.username}, function (err, messages) {
@@ -27,6 +42,15 @@ function postMessage(req,res){
     });
 }
 
+function postFromServer(req){
+    const Models = require("../models");
+
+    const NewMessage = Models.Message({user: req.user, content: req.content})
+    NewMessage.save(function (err,message){
+        if (err) return console.error(err);
+    });
+}
+
 function deleteMessage(req,res){
 
     const Models = require('../models');
@@ -38,6 +62,8 @@ function deleteMessage(req,res){
 
 
 module.exports.getMessages = getMessages;
+module.exports.promiseGetMessages = promiseGetMessages;
 module.exports.getMessageByUser = getMessageByUser;
 module.exports.postMessage = postMessage;
 module.exports.deleteMessage = deleteMessage;
+module.exports.postFromServer = postFromServer;

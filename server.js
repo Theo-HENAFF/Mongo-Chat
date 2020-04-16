@@ -1,11 +1,12 @@
-var express = require('express');
-var app = express();
-var cors = require('cors');
-var http = require('http').Server(app).listen(3000);
-var io = require('socket.io')(http);
-var i;
+const express = require('express');
+const app = express();
+const cors = require('cors');
+const http = require('http').Server(app).listen(3000);
+const io = require('socket.io')(http);
+let i;
 const redis = require("redis");
 const client = redis.createClient();
+const controllers = require("./controllers")
 
 app.use(cors());
 
@@ -14,7 +15,6 @@ app.use(express.urlencoded({ extended: false }));
 
 const Routes = require('./routes');
 app.use(Routes);
-
 
 
 /**
@@ -26,11 +26,6 @@ app.use('/', express.static(__dirname + '/public'));
  * Liste des utilisateurs connectés
  */
 var users = [];
-
-/**
- * Historique des messages
- */
-var messages = [];
 
 /**
  * Liste des utilisateurs en train de saisir un message
@@ -54,28 +49,14 @@ io.on('connection', function (socket) {
   /** 
    * Emission d'un événement "chat-message" pour chaque message de l'historique
    */
-  for (i = 0; i < messages.length; i++) {
-    if (messages[i].type === 'chat-message') {
-      socket.emit('chat-message', messages[i]);
-    } else {
-      socket.emit('service-message', messages[i]);
+  const old_messages = controllers.promiseGetMessages();
+  old_messages.then(function(value) {
+    for (const message of value) {
+      const mess = {username: message.user, text: message.content, type: "chat-message"};
+      socket.emit("chat-message", mess);
     }
-  }
+  });
 
-  // $.get("/api/message/".concat(user.username),function(messagess){
-  //   console.log(messagess)
-  //   messagess.forEach(function(mess) {
-  //     var message = {label: mess.user, text: "message antérieur du ".concat(mess.createdAt,": ",mess.content)}
-  //     socket.emit('chat-message', message);
-  //   })
-  // });
-  // var res = Mess.find({}, function (err, messages) {
-  //   if (err) throw err;
-  // });
-  // console.log(res);
-
-  // var allmessages = controller.getMessages()
-  // console.log(allmessages)
 
   /**
    * Déconnexion d'un utilisateur
@@ -93,8 +74,6 @@ io.on('connection', function (socket) {
       if (userIndex !== -1) {
         users.splice(userIndex, 1);
       }
-      // Ajout du message à l'historique
-      messages.push(serviceMessage);
 
       // Emission d'un 'user-logout' contenant le user
       io.emit('user-logout', loggedUser);
@@ -141,7 +120,6 @@ io.on('connection', function (socket) {
       };
       socket.emit('service-message', userServiceMessage);
       socket.broadcast.emit('service-message', broadcastedServiceMessage);
-      messages.push(broadcastedServiceMessage);
 
       // Emission de 'user-login' et appel du callback
       io.emit('user-login', loggedUser);
@@ -161,17 +139,8 @@ io.on('connection', function (socket) {
     message.type = 'chat-message';
     io.emit('chat-message', message);
 
-    var newmess = new Mess ({user : message.username, content : message.text}) ;
-    console.log(newmess);
-    newmess.save(function (err,message){
-      if (err) return console.error(err);
-    });
-
     // Sauvegarde du message
-    messages.push(message);
-    if (messages.length > 150) {
-      messages.splice(0, 1);
-    }
+    controllers.postFromServer({user: message.username, content: message.text})
   });
 
   /**
@@ -212,16 +181,5 @@ mongoose.connect(database, (err) => {
 });
 console.log("Waiting on localhost:3000");
 
-var schema = mongoose.Schema(    {
-  user: String,
-  content: {
-    type: String,
-    default: 'DEFAULT_CONTENT'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-});
-var Mess = mongoose.model('message',schema,'messages')
+
 module.exports = app;
