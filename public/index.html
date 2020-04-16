@@ -15,7 +15,7 @@
           </span> { message.text }
         </li>
       </ul><ul id="users">
-        <label>YOUHOU</label>
+        <span class="title">Users connected</span>
         <li rv-each-user="users" class="new" rv-id="user.username">{ user.username } <span class="typing" rv-show="user.typing">typing</span></li>
       </ul>
       <form action="">

@@ -112,7 +112,18 @@ section#chat #users li {
 section#chat #users li span.typing {
     float: right;
     font-style: italic;
-    color: #eee;
+    color: #0c0c0c;
+}
+section#chat #users span.title {
+    display: inline-block;
+    vertical-align: top;
+    overflow: auto;
+    width: 220px;
+    padding: 6px 10px;
+    color: white;
+    font-size: 18px;
+    background: #e60911;
+    border-radius: 5px;
 }
 section#login {
     transition: all 0.5s;
