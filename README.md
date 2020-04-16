@@ -2,7 +2,8 @@
 
 
 * Stockage des users dans Redis (utiliser un redis-cli pour les afficher " LRANGE users-list ")
-* Les messages sont stocké sur une base mongodb (db: CHAT colletion : messages)
+* Les messages sont stocké sur une base mongodb (db: CHAT collection : messages)
+* A la connexion d'un utilisateur les messages précédents sont affichés après un GET depuis MongoDB
 * Utilisation Replicaset (vor le ficher ReplicaSet.docx pour la démarche)
 
 
@@ -10,7 +11,7 @@
 
 ## Installation
 
-Installer Bowser
+Installer Bower
 ```
 npm install -g bower
 ```
