@@ -22,7 +22,10 @@
             { user.username } <span class="typing" rv-show="user.typing">typing</span>
         </li>
         <span class="title">Rooms</span>
-        <button onclick="switchRoom('room2')">room2</button>
+        <span class="room" id="1">room1</span>
+        <span class="room" id="2">room2</span>
+
+
     </ul>
     <form action="">
         <input id="m" autocomplete="off"/>
@@ -47,8 +50,20 @@
 <script src="utils.js"></script>
 <script src="client.js"></script>
 <script>
-    function switchRoom(room) {
-        console.log("Youhou")
-        socket.emit('switchRoom', room);
-    }
+    $( document ).ready(function() {
+        $( "section#chat #users #1" ).click(function switchRoom() {
+            const room = "room1";
+            console.log("Youhou")
+            socket.emit('switchRoom', room);
+            $("section#chat #messages li").hide();
+            socket.emit('loadRoomMessage');
+        });
+        $( "section#chat #users #2" ).click(function switchRoom() {
+            const room = "room2";
+            console.log("Youhou")
+            socket.emit('switchRoom', room);
+            $("section#chat #messages li").hide();
+            socket.emit('loadRoomMessage');
+        });
+    });
 </script>

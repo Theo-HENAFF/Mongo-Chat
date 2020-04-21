@@ -146,6 +146,20 @@ section#chat #users span.title {
     border-radius: 5px;
 }
 
+section#chat #users span.room{
+    display: inline-block;
+    vertical-align: top;
+    overflow: auto;
+    width: 220px;
+    padding: 6px 10px;
+    margin: 10px 0px;
+    color: white;
+    font-size: 18px;
+    background: #e67e22;
+    border-radius: 5px;
+}
+
+
 section#login {
     transition: all 0.5s;
     opacity: 0;

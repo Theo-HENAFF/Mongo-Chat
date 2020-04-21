@@ -37,9 +37,11 @@ var rooms = ['room1','room2','room3'];
  * Liste des utilisateurs en train de saisir un message
  */
 var typingUsers = [];
+client.del("users-list"); //Delete la liste pour eviter probleme de déco
+
 
 io.on('connection', function (socket) {
-
+    socket.room = 'room1'
     /**
      * Utilisateur connecté à la socket
      */
@@ -49,13 +51,13 @@ io.on('connection', function (socket) {
      * Emission d'un événement "user-login" pour chaque utilisateur connecté
      */
     for (i = 0; i < users.length; i++) {
-        socket.emit('user-login', users[i]);
+        socket.emit('user-login', JSON.parse(users[i]));
     }
 
     /**
      * Emission d'un événement "chat-message" pour chaque message de l'historique
      */
-    const old_messages = controllers.promiseGetMessages();
+    const old_messages = controllers.promiseGetMessagesByRoom({room:socket.room});
     old_messages.then(function (value) {
         for (const message of value) {
             const mess = {username: message.user, text: message.content, type: "chat-message"};
@@ -85,13 +87,15 @@ io.on('connection', function (socket) {
             io.emit('user-logout', loggedUser);
 
             //Suppression du user de Redis
-            client.lrem(['users-list', 1, JSON.stringify(loggedUser.username)]);
-            console.log(JSON.stringify(loggedUser.username))
-            // Si jamais il était en train de saisir un texte, on l'enlève de la liste
-            var typingUserIndex = typingUsers.indexOf(loggedUser);
-            if (typingUserIndex !== -1) {
-                typingUsers.splice(typingUserIndex, 1);
-            }
+            client.lrem(['users-list',0,JSON.stringify(loggedUser) ], function(err, reply) { //REDIS - On enlève l'user de la db, on utilise la version stringifiée du json
+                if (err) throw err;
+                console.log(reply); // On s'assure que la suppression s'est bien faite
+            });
+            client.lrange("users-list",0,-1, function(err,reply) { // on remet à jour la variable users
+                if (err) throw err;
+                users=reply;
+            });
+
         }
     });
 
@@ -104,18 +108,25 @@ io.on('connection', function (socket) {
         // Vérification que l'utilisateur n'existe pas
         var userIndex = -1;
         for (i = 0; i < users.length; i++) {
-            if (users[i].username === user.username) {
+            if (JSON.parse(users[i]).username === user.username) {
                 userIndex = i;
             }
         }
         if (user !== undefined && userIndex === -1) { // S'il est bien nouveau
             // Sauvegarde de l'utilisateur et ajout à la liste des connectés
             loggedUser = user;
-            users.push(loggedUser);
+            // users.push(loggedUser);
 
             //Envoi du user a Redis
-            client.rpush(['users-list', JSON.stringify(loggedUser.username)]);
-            JSON.stringify(loggedUser.username)
+            client.rpush(['users-list', JSON.stringify(loggedUser)], function(err, reply) {
+                if (err) throw err;
+                console.log(reply); // On s'assure que l'ajout s'est bien fait
+            });
+            client.lrange("users-list",0,-1, function(err,reply) { // on remet à jour la variable users
+                if (err) throw err;
+                users=reply;
+                console.log(users);
+            });
 
             //Le user join la room 1 par défaut
             socket.room = 'room1';
@@ -143,6 +154,7 @@ io.on('connection', function (socket) {
         }
     });
 
+
     /**
      * Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
      */
@@ -153,8 +165,9 @@ io.on('connection', function (socket) {
         message.type = 'chat-message';
         io.emit('chat-message', message);
 
+
         // Sauvegarde du message
-        controllers.postFromServer({user: message.username, content: message.text})
+        controllers.postFromServer({user: socket.username, content: message.text, room: socket.room})
     });
 
     /**
@@ -183,12 +196,25 @@ io.on('connection', function (socket) {
 
     /**
      * Réception de l'événement 'switchRoom'
+     * afficher les messages d'une room
+     */
+    socket.on('loadRoomMessage', function () {
+        const old_messages = controllers.promiseGetMessagesByRoom({room:socket.room});
+        old_messages.then(function (value) {
+            for (const message of value) {
+                const mess = {username: message.user, text: message.content, type: "chat-message"};
+                socket.emit("chat-message", mess);
+            }
+        });
+    });
+
+    /**
+     * Réception de l'événement 'switchRoom'
      * L'utilisateur change de salle de chat
      */
     socket.on('switchRoom', function(newroom){
         // Emission d'un 'user-logout' contenant le user
         io.emit('user-logout', socket.username);
-
         // leave the current room (stored in session)
         socket.leave(socket.room);
         // join new room, received as function parameter
@@ -209,6 +235,7 @@ io.on('connection', function (socket) {
 
         // update socket session room title
         socket.room = newroom;
+        console.log(socket.room)
         socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
         socket.emit('updaterooms', rooms, newroom);
     });

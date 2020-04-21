@@ -7,10 +7,10 @@ function getMessages(req, res) {
 }
 
 
-function promiseGetMessages(req, res) {
+function promiseGetMessagesByRoom(req, res) {
     return new Promise(function (resolve, reject) {
         const Models = require("../models");
-        Models.Message.find({}).limit(100).exec(function (err, messages) {
+        Models.Message.find({room: req.room}).limit(100).exec(function (err, messages) {
             if (err) throw err;
             resolve(messages);
         });
@@ -32,6 +32,7 @@ function postMessage(req, res) {
     const newMessage = Models.Message({
         user: req.body.user,
         content: req.body.content,
+        room: req.body.room,
     });
     newMessage.save(function (err, mess) {
         if (err) throw err;
@@ -42,7 +43,7 @@ function postMessage(req, res) {
 function postFromServer(req) {
     const Models = require("../models");
 
-    const NewMessage = Models.Message({user: req.user, content: req.content})
+    const NewMessage = Models.Message({user: req.user, content: req.content, room: req.room})
     NewMessage.save(function (err, message) {
         if (err) return console.error(err);
     });
@@ -59,7 +60,7 @@ function deleteMessage(req, res) {
 
 
 module.exports.getMessages = getMessages;
-module.exports.promiseGetMessages = promiseGetMessages;
+module.exports.promiseGetMessagesByRoom = promiseGetMessagesByRoom;
 module.exports.getMessageByUser = getMessageByUser;
 module.exports.postMessage = postMessage;
 module.exports.deleteMessage = deleteMessage;

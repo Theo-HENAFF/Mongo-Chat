@@ -97,7 +97,7 @@ socket.on('user-login', function (user) {
  * Déconnexion d'un utilisateur
  */
 socket.on('user-logout', function (user) {
-    var userIndex = users.indexOf(user);
+    var userIndex = users.map(function(e) {return e.username; }).indexOf(user.username);
     if (userIndex !== -1) {
         users.splice(userIndex, 1);
     }

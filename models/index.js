@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema(
     {
+        room: {
+            type: String,
+            default: 'room1'
+        },
         user: String,
         content: {
             type: String,
