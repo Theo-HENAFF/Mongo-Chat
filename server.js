@@ -163,8 +163,9 @@ io.on('connection', function (socket) {
         message.username = loggedUser.username;
         // On assigne le type "message" à l'objet
         message.type = 'chat-message';
-        io.emit('chat-message', message);
-
+        // io.emit('chat-message', message);
+        socket.emit('chat-message', message);
+        socket.broadcast.to(socket.room).emit('chat-message', message);
 
         // Sauvegarde du message
         controllers.postFromServer({user: socket.username, content: message.text, room: socket.room})
@@ -213,8 +214,10 @@ io.on('connection', function (socket) {
      * L'utilisateur change de salle de chat
      */
     socket.on('switchRoom', function(newroom){
+        const oldroom = socket.room
         // Emission d'un 'user-logout' contenant le user
         io.emit('user-logout', socket.username);
+
         // leave the current room (stored in session)
         socket.leave(socket.room);
         // join new room, received as function parameter
@@ -231,7 +234,8 @@ io.on('connection', function (socket) {
             type: 'login'
         };
         socket.emit('service-message', userServiceMessage);
-        socket.broadcast.emit('service-message', broadcastedServiceMessage);
+        socket.broadcast.to(oldroom).emit('service-message', broadcastedServiceMessage);
+        socket.broadcast.to(newroom).emit('service-message', broadcastedServiceMessage);
 
         // update socket session room title
         socket.room = newroom;
