@@ -15,8 +15,8 @@ var messages = [];
 /**
  * Liste des utilisateurs
  */
-var users = [];
 
+var users=[];
 
 /*** DataBinding initial ***/
 
@@ -34,6 +34,7 @@ $('#login form').submit(function (e) {
     e.preventDefault();
     var user = {
         username: $('#login input').val().trim()
+
     };
 
     if (user.username.length > 0) { // Si le champ de connexion n'est pas vide
@@ -64,6 +65,7 @@ $("#chat form").submit(function (e) {
 });
 
 
+
 /**
  * Réception d'un message
  */
@@ -86,6 +88,7 @@ socket.on('service-message', function (message) {
 /**
  * Connexion d'un nouvel utilisateur
  */
+
 socket.on('user-login', function (user) {
     users.push(user);
     setTimeout(function () {

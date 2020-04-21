@@ -2,7 +2,7 @@
 
 
 * Stockage des users dans Redis (utiliser un redis-cli pour les afficher " LRANGE users-list ")
-* Les messages sont stocké sur une base mongodb (db: CHAT collection : messages)
+* Les messages sont stockés sur une base mongodb (db: CHAT collection : messages)
 * A la connexion d'un utilisateur les messages précédents sont affichés après un GET depuis MongoDB
 * Utilisation Replicaset (vor le ficher ReplicaSet.docx pour la démarche)
 
@@ -30,6 +30,24 @@ node server
 ```
 
 L'application est désormais accesssible à l'url **http://localhost:3000/**.
+
+## Quelque requêtes mongo utiles:
+Lancer ces requêtes sur un mongo shell connecté à la base CHAT.
+
+Avoir tous les messages d'un user par son username (ici "toto"):
+```
+db.messages.find({user:"toto"}).pretty()
+```
+
+L'utilisateur qui a envoyé le plus de messages
+```
+db.messages.aggregate({$group:{_id:"$user",nombreMessage:{$sum:1}}},{$sort:{nombrebMessage:-1}},{$limit:1})
+```
+La room la plus utiisée : 
+
+```
+db.messages.aggregate({$group:{_id:"$room",nbMessage:{$sum:1}}},{$sort:{nbMessage:-1}},{ $limit:1 })
+```
 
 Contributeurs : HENAFF , NASRI
 
