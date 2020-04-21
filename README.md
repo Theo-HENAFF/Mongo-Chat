@@ -31,7 +31,7 @@ node server
 
 L'application est désormais accesssible à l'url **http://localhost:3000/**.
 
-## Quelque requêtes mongo utiles:
+## Quelques requêtes mongo utiles:
 Lancer ces requêtes sur un mongo shell connecté à la base CHAT.
 
 Avoir tous les messages d'un user par son username (ici "toto"):
@@ -46,7 +46,7 @@ db.messages.aggregate({$group:{_id:"$user",nombreMessage:{$sum:1}}},{$sort:{nomb
 La room la plus utiisée : 
 
 ```
-db.messages.aggregate({$group:{_id:"$room",nbMessage:{$sum:1}}},{$sort:{nbMessage:-1}},{ $limit:1 })
+db.messages.aggregate({$group:{_id:"$room",nombreMessage:{$sum:1}}},{$sort:{nombreMessage:-1}},{ $limit:1 })
 ```
 
 Contributeurs : HENAFF , NASRI
