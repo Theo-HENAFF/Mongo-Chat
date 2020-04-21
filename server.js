@@ -28,7 +28,6 @@ app.use('/', express.static(__dirname + '/public'));
  */
 var users = [];
 
-
 /**
  * Liste des salles de chat
  */
@@ -53,6 +52,7 @@ io.on('connection', function (socket) {
     for (i = 0; i < users.length; i++) {
         socket.emit('user-login', JSON.parse(users[i]));
     }
+
 
     /**
      * Emission d'un événement "chat-message" pour chaque message de l'historique

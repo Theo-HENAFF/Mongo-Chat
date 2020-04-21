@@ -1,7 +1,5 @@
-/*global io, rivets, utils*/
-/*jslint browser: true*/
-var socket = io();
-var i, j;
+const socket = io();
+let i, j;
 
 
 src = "bower_components/sightglass/index.js"
