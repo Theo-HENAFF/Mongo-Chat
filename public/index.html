@@ -1,8 +1,9 @@
 <!doctype html>
+
 <html>
 <head>
     <link rel="stylesheet" href="style.css"/>
-    <title>Socket.IO chat</title>
+    <title>Socket.IO NASRI HENAFF chat</title>
     <style>
     </style>
 </head>
@@ -17,9 +18,11 @@
     </ul>
     <ul id="users">
         <span class="title">Users connected</span>
-        <li rv-each-user="users" class="new" rv-id="user.username">{ user.username } <span class="typing"
-                                                                                           rv-show="user.typing">typing</span>
+        <li rv-each-user="users" class="new" rv-id="user.username">
+            { user.username } <span class="typing" rv-show="user.typing">typing</span>
         </li>
+        <span class="title">Rooms</span>
+        <button onclick="switchRoom('room2')">room2</button>
     </ul>
     <form action="">
         <input id="m" autocomplete="off"/>
@@ -35,13 +38,17 @@
         </p>
     </form>
 </section>
+</body>
+</html>
+
 <script src="components/rivets/dist/rivets.bundled.min.js"></script>
 <script src="components/jquery/dist/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="utils.js"></script>
 <script src="client.js"></script>
-</body>
-</html>
-
 <script>
+    function switchRoom(room) {
+        console.log("Youhou")
+        socket.emit('switchRoom', room);
+    }
 </script>

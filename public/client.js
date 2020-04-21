@@ -3,6 +3,7 @@
 var socket = io();
 var i, j;
 
+
 src = "bower_components/sightglass/index.js"
 src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"
 
@@ -46,10 +47,11 @@ $('#login form').submit(function (e) {
 });
 
 
+
 /**
  * Envoi d'un message
  */
-$('#chat form').submit(function (e) {
+$("#chat form").submit(function (e) {
     e.preventDefault();
     var message = {
         text: $('#m').val()
@@ -60,6 +62,7 @@ $('#chat form').submit(function (e) {
     }
     $('#chat input').focus(); // Focus sur le champ du message
 });
+
 
 /**
  * Réception d'un message

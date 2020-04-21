@@ -28,6 +28,11 @@ app.use('/', express.static(__dirname + '/public'));
  */
 var users = [];
 
+
+/**
+ * Liste des salles de chat
+ */
+var rooms = ['room1','room2','room3'];
 /**
  * Liste des utilisateurs en train de saisir un message
  */
@@ -94,6 +99,8 @@ io.on('connection', function (socket) {
      * Connexion d'un utilisateur via le formulaire :
      */
     socket.on('user-login', function (user, callback) {
+        socket.username = user.username
+
         // Vérification que l'utilisateur n'existe pas
         var userIndex = -1;
         for (i = 0; i < users.length; i++) {
@@ -110,12 +117,18 @@ io.on('connection', function (socket) {
             client.rpush(['users-list', JSON.stringify(loggedUser.username)]);
             JSON.stringify(loggedUser.username)
 
+            //Le user join la room 1 par défaut
+            socket.room = 'room1';
+            socket.join('room1');
+
+
+
             // Envoi et sauvegarde des messages de service
-            var userServiceMessage = {
+            const userServiceMessage = {
                 text: 'You logged in as "' + loggedUser.username + '"',
                 type: 'login'
             };
-            var broadcastedServiceMessage = {
+            const broadcastedServiceMessage = {
                 text: 'User "' + loggedUser.username + '" logged in',
                 type: 'login'
             };
@@ -167,6 +180,41 @@ io.on('connection', function (socket) {
         }
         io.emit('update-typing', typingUsers);
     });
+
+    /**
+     * Réception de l'événement 'switchRoom'
+     * L'utilisateur change de salle de chat
+     */
+    socket.on('switchRoom', function(newroom){
+        // Emission d'un 'user-logout' contenant le user
+        io.emit('user-logout', socket.username);
+
+        // leave the current room (stored in session)
+        socket.leave(socket.room);
+        // join new room, received as function parameter
+        socket.room = newroom;
+        socket.join(newroom);
+
+        // Envoi et sauvegarde des messages de service
+        const userServiceMessage = {
+            text: 'You logged in room "' + newroom + '"',
+            type: 'login'
+        };
+        const broadcastedServiceMessage = {
+            text: 'User "' + socket.username + '" logged in "' + newroom +'"',
+            type: 'login'
+        };
+        socket.emit('service-message', userServiceMessage);
+        socket.broadcast.emit('service-message', broadcastedServiceMessage);
+
+        // update socket session room title
+        socket.room = newroom;
+        socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
+        socket.emit('updaterooms', rooms, newroom);
+    });
+
+
+
 });
 
 /**
