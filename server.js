@@ -66,6 +66,7 @@ io.on('connection', function (socket) {
     });
 
 
+
     /**
      * Déconnexion d'un utilisateur
      */
@@ -82,7 +83,6 @@ io.on('connection', function (socket) {
             if (userIndex !== -1) {
                 users.splice(userIndex, 1);
             }
-
             // Emission d'un 'user-logout' contenant le user
             io.emit('user-logout', loggedUser);
 
@@ -154,7 +154,6 @@ io.on('connection', function (socket) {
         }
     });
 
-
     /**
      * Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
      */
@@ -225,33 +224,28 @@ io.on('connection', function (socket) {
         socket.join(newroom);
 
         // Envoi et sauvegarde des messages de service
-        const userServiceMessage = {
-            text: 'You logged in room "' + newroom + '"',
+        const oldbroadcastedServiceMessage = {
+            text: 'User "' + socket.username + '" logged out of this room',
+            type: 'logout'
+        };
+        const newbroadcastedServiceMessage = {
+            text: 'User "' + socket.username + '" logged in this room',
             type: 'login'
         };
-        const broadcastedServiceMessage = {
-            text: 'User "' + socket.username + '" logged in "' + newroom +'"',
+        const userServiceMessage = {
+            text: 'You are logged in room "' + newroom + '"',
             type: 'login'
         };
         socket.emit('service-message', userServiceMessage);
-        socket.broadcast.to(oldroom).emit('service-message', broadcastedServiceMessage);
-        socket.broadcast.to(newroom).emit('service-message', broadcastedServiceMessage);
-
-        // update socket session room title
-        socket.room = newroom;
-        console.log(socket.room)
-        socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
-        socket.emit('updaterooms', rooms, newroom);
+        socket.broadcast.to(oldroom).emit('service-message', oldbroadcastedServiceMessage);
+        socket.broadcast.to(newroom).emit('service-message', newbroadcastedServiceMessage);
     });
-
-
-
 });
+
 
 /**
  * Lancement du serveur en écoutant les connexions arrivant sur le port 3000
  */
-
 const mongoose = require('mongoose');
 database = 'mongodb://localhost:27017/CHAT';
 mongoose.connect(database, (err) => {

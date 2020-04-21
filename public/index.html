@@ -22,10 +22,8 @@
             { user.username } <span class="typing" rv-show="user.typing">typing</span>
         </li>
         <span class="title">Rooms</span>
-        <span class="room" id="1">room1</span>
-        <span class="room" id="2">room2</span>
-
-
+        <span class="room-in" id="1">room1</span>
+        <span class="room-out" id="2">room2</span>
     </ul>
     <form action="">
         <input id="m" autocomplete="off"/>
@@ -50,20 +48,32 @@
 <script src="utils.js"></script>
 <script src="client.js"></script>
 <script>
-    $( document ).ready(function() {
-        $( "section#chat #users #1" ).click(function switchRoom() {
+    $(document).ready(function() {
+
+        $( "section#chat #users #1" ).on('click', function switchRoom1() {
             const room = "room1";
-            console.log("Youhou")
             socket.emit('switchRoom', room);
-            $("section#chat #messages li").hide();
+            $("section#chat #messages li").remove();
             socket.emit('loadRoomMessage');
+
+            $( "section#chat #users #1" ).removeClass("room-out");
+            $( "section#chat #users #2" ).removeClass("room-in");
+
+            $( "section#chat #users #1" ).addClass("room-in");
+            $( "section#chat #users #2" ).addClass("room-out");
         });
-        $( "section#chat #users #2" ).click(function switchRoom() {
+
+        $( "section#chat #users #2" ).on('click', function switchRoom2() {
             const room = "room2";
-            console.log("Youhou")
             socket.emit('switchRoom', room);
-            $("section#chat #messages li").hide();
+            $("section#chat #messages li").remove();
             socket.emit('loadRoomMessage');
+
+            $( "section#chat #users #2" ).removeClass("room-out");
+            $( "section#chat #users #1" ).removeClass("room-in");
+
+            $( "section#chat #users #2" ).addClass("room-in");
+            $( "section#chat #users #1" ).addClass("room-out");
         });
     });
 </script>
